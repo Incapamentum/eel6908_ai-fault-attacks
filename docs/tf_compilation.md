@@ -125,3 +125,45 @@ bazel test --jobs=8 --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" -c opt \
 	//tensorflow/tools/l;ib_package:libtensorflow_test
 ```
 
+## 6) Protobuf Check
+
+1. Check the version of protobuf supported by TensorFlow. From the source directory:
+
+```bash
+bazel-bin/external/com_google_protobuf/protoc --version
+```
+
+2. Once the version is known, download the correct source code from its [release page](https://github.com/protocolbuffers/protobuf/tags).
+3. Go ahead and untar the archive:
+
+```bash
+tar -xf protobuf-<VERSION_NUMBER>.tar.gz -C /PATH/TO/DUMP/TO
+```
+
+2. From source directory, compile and link:
+
+```bash
+./configure
+make
+make check
+make install
+```
+
+## 7) Copy Required Files to a Single Path
+
+At this point, both Protobuf and Tensorflow C++ API have been built. Now, we will copy the necessary files into a single path for C++ linkage purposes:
+
+```bash
+# Create directories
+sudo mkdir /usr/local/tensorflow
+sudo mkdir /usr/local/tensorflow/lib
+
+# From tensorflow source directory:
+sudo cp -r bazel-bin/tensorflow/include/ /usr/local/tensorflow/
+sudo cp -r bazel-bin/tensorflow/*.so* /usr/local/tensorflow/lib
+
+# From protobuf source directory:
+sudo cp -r /PATH/TO/SOURCE/protobuf-<VERSION_NUMBER>/include/google/ /usr/local/tensorflow/include/
+sudo cp -r /PATH/TO/SOURCE/protobuf-<VERSION_NUMBER>/lib/*.so* /usr/local/tensorflow/lib
+```
+
