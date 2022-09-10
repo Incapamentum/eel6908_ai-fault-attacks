@@ -1,14 +1,8 @@
-# EEL 6908 - Fault Attacks in AI Models
-
-## Tensorflow Framework
-
-Tensorflow (TF) is a free and open-source software library in developing ML and AI applications. It has a particular focus towards the training and inference of deep neural networks (DNNs).
-
-### Compile Tensforflow C++ API from Source
+# TensorFlow C++ API Compilation
 
 The following are directions on installing the Tensorflow C++ API from source. This process can be very tricky, and I have documented the build process I have taken below. Some insight was gained by looking through different sources, such as the [official docs](https://www.tensorflow.org/install/source) and [third-party](https://github.com/rangsimanketkaew/tensorflow-cpp-api/blob/main/compile_tensorflow_cpp.md).
 
-#### Platform
+## Platform
 
 OS: Ubuntu 20.04.5 LTS
 
@@ -16,18 +10,18 @@ CPU: AMD Ryzen 7 3700X
 
 RAM: 32GB
 
-#### Dependencies
+## Dependencies
 
 - Conda 4.14.0
-- Python3* 3.8.10
+- Python3* 3.9.13
   - Numpy 1.23.1
-- GCC* 9.4.0
-- Bazelisk* 5.0.0
+- GCC* 7.5.0
+- Bazelisk* 3.7.2
 - Protobul
 
 * Versions of these tools will depend on the version of the Tensorflow C++ API that will be built. A list of supported tools can be found [here](https://www.tensorflow.org/install/source#tested_build_configurations).
 
-#### 1) Environment Setup
+## 1) Environment Setup
 
 Followed [these](https://docs.anaconda.com/anaconda/install/linux/) installation instructions for Anaconda. Then, created the environment:
 
@@ -39,18 +33,27 @@ conda install python==3.9.9 # Package is unavailable; using v3.8.10
 conda install numpy
 ```
 
-According to the official docs, there are additional package dependencies (currently unsure if needed for C++ API):
+According to the official docs, there are additional package dependencies:
 
 ```bash
 conda install wheel packaging requests opt_einsum
-conda install keras_preprocessing --no-deps # Package not available
+conda install -c conda-forge keras-preprocessing --no-deps
 ```
 
-#### 2) Install Bazel
+Seems like the `keras-preprocessing` package isn't located in any of the sources where Conda looks in. A work-around is by specifying the source. In this case, a package for `keras-preprocessing` can be found in `conda-forge`.
+
+## 2) Install Bazel
 
 I highly recommend building with Bazelisk as opposed to using Bazel. Big reason being is that Bazelisk automatically downloads the correct Bazel version needed to build Tensorflow. I recommended following [https://docs.bazel.build/versions/main/install-bazelisk.html](https://docs.bazel.build/versions/main/install-bazelisk.html) installation instructions.
 
-#### 3) Configure the build
+Once Bazelisk is installed, I ended up creating a symbolic link in `usr/bin/` to associate `bazelisk` with `bazel` as follows:
+
+```bash
+which bazelisk # Double-check to ensure the install location of Bazelisk
+sudo ln -s /usr/bin/bazelisk /usr/bin/bazel # Better way than using an alias
+```
+
+## 3) Configure the build
 
 Download/clone the GitHub repo to system:
 
@@ -68,16 +71,16 @@ Configure the build:
 
 According to the official docs, you may have to use `python configure.py` if using a virtual environment, as it prioritizes paths within the environment. I'm currently unsure whether this affects the Conda environment or not.
 
-**NOTE**: in configuring the build, there are a lot of options presented. Be wary of what you're selecting.
+**NOTE**: in configuring the build, there are a lot of options presented. Be wary of what you're selecting. Check out the [https://www.tensorflow.org/install/source#expandable-1](https://www.tensorflow.org/install/source#expandable-1) if you'd like to see a sample configuration session.
 
-#### 4) Compile
+## 4) Compile
 
 The Tensorflow C++ API will be compiled to a shared library. It will be compiled using `bazelisk`:
 
 ```bash
 export CC=gcc
 export CXX=g++
-bazelisk build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
+bazel build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
 	--cxxopt="-D_GLIBCXX_USE_CX11_ABI=0" \
 	--strip=never --copt=-O -c dbg -c opt \ # Debug optimizations
 	--copt=-mfma --copt=-msse4.1 \ # Include for instruction optimizations
@@ -93,3 +96,32 @@ bazelisk build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
 ```
 
 **NOTE**: I'm not always using the above options due to sometimes the build failing, and it is difficult to understand what causes the errors.
+
+### Addendum
+
+The above instructions were taken from a third-party repo. It helped as it provided a useful reference into what compile options should be pursued. The below is what ended up working for me in the end:
+
+```bash
+export CC=gcc-7
+export CXX=g++-7
+bazel build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
+	--cxxopt="-D_GLIBCXX_USE_CX11_ABI=0" \
+    --strip=never --copt=-O -c dbg -c opt \
+    --config=noaws --config=nogcp --config=nohdfs --config=nonccl \
+    --config=monolithic \
+    //tensorflow:libtensorflow.so \
+    //tensorflow:libtensorflow_cc.so \
+    //tensorflow:libtensorflow_framework.so \
+    //tensorflow:install_headers \
+    //tensorflow/tools/pip_package:build_pip_package
+```
+
+## 5) Sanity Check
+
+Although this was presented as optional, for the sake of anyone's mental sanity, I highly recommend checking that the build was successful (even if it seems like it was):
+
+```bash
+bazel test --jobs=8 --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" -c opt \
+	//tensorflow/tools/l;ib_package:libtensorflow_test
+```
+
