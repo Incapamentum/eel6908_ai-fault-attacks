@@ -106,7 +106,7 @@ export CC=gcc-7
 export CXX=g++-7
 bazel build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
 	--cxxopt="-D_GLIBCXX_USE_CX11_ABI=0" \
-    --strip=never --copt=-O -c dbg -c opt \
+    --strip=never --config=dbg \
     --config=noaws --config=nogcp --config=nohdfs --config=nonccl \
     --config=monolithic \
     //tensorflow:libtensorflow.so \
@@ -116,14 +116,18 @@ bazel build --jobs=8 --local_ram_resources="HOST_RAM*.50" \
     //tensorflow/tools/pip_package:build_pip_package
 ```
 
+The above builds the Tensorflow C++ API with debug symbols via the `--config=dbg` option. This was inferred from the official repo, in the contribution section for [debug builds](https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md#debug-builds).
+
 ## 5) Sanity Check
 
 Although this was presented as optional, for the sake of anyone's mental sanity, I highly recommend checking that the build was successful (even if it seems like it was):
 
 ```bash
-bazel test --jobs=8 --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" -c opt \
-	//tensorflow/tools/l;ib_package:libtensorflow_test
+bazel test --jobs=8 --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
+	//tensorflow/tools/lib_package:libtensorflow_test
 ```
+
+**NOTE**: performing unit tests requires that the JRE/JDK Is installed.
 
 ## 6) Protobuf Check
 
