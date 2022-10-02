@@ -1,0 +1,11 @@
+https://discuss.tensorflow.org/t/how-to-build-tensorflow-debug-version/6356
+
+https://naurril.github.io/howtos/2017/04/25/how-to-debug-tensorflow.html
+
+https://nekodaemon.com/2021/08/04/Easy-way-to-debug-TensorFlow-XLA-Compiler-using-VSCode/
+
+https://groups.google.com/a/tensorflow.org/g/tflite/c/c4xNf_TrDrY
+
+https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md
+
+https://www.google.com/search?channel=fs&client=ubuntu&q=ide+to+debug+python%2Fc%2B%2B+code
