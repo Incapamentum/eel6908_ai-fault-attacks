@@ -2,6 +2,8 @@
 
 The following are directions on installing the Tensorflow C++ API from source. This process can be very tricky, and I have documented the build process I have taken below. Some insight was gained by looking through different sources, such as the [official docs](https://www.tensorflow.org/install/source) and [third-party](https://github.com/rangsimanketkaew/tensorflow-cpp-api/blob/main/compile_tensorflow_cpp.md).
 
+**NOTE**: This was abandoned in favor of building LibTorch, which is the C++ frontend for PyTorch. Build instructions can be found [here](/docs/pytorch_compilation.md).
+
 ## Platform
 
 OS: Ubuntu 20.04.5 LTS
