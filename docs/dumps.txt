@@ -9,3 +9,5 @@ https://groups.google.com/a/tensorflow.org/g/tflite/c/c4xNf_TrDrY
 https://github.com/tensorflow/tensorflow/blob/master/CONTRIBUTING.md
 
 https://www.google.com/search?channel=fs&client=ubuntu&q=ide+to+debug+python%2Fc%2B%2B+code
+
+https://github.com/pytorch/pytorch/blob/master/docs/libtorch.rst
