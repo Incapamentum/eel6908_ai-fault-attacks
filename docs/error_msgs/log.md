@@ -1,3 +1,7 @@
+# Error Logs
+
+In the building of the Tensorflow C++ API, a lot of errors were being spit out that where difficult to fully understand, yet were saved in the hopes to try and make better sense of them on top of "saving work".
+
 ## 09/10/2022
 
 ```bash
