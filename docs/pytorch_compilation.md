@@ -48,8 +48,6 @@ conda install mkl mkl-include
 conda install -c pytorch magma-cuda110  # or the magma-cuda* that matches your CUDA version from https://anaconda.org/pytorch/repo
 ```
 
-
-
 ### 2) Get PyTorch Source
 
 ```bash
@@ -153,26 +151,38 @@ cd build_libtorch
 Then, run `cmake` with the following build options:
 
 ```bash
-cmake -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_PYTHON=OFF -DBUILD_TEST=OFF \
+cmake -DBUILD_SHARED_LIBS:BOOL=ON \
+-DBUILD_BINARY=ON -DBUILD_PYTHON=OFF -DBUILD_TEST=OFF \
 -DTORCH_SHOW_CPP_STACKTRACES=ON -DUSE_CUDA=OFF -DUSE_DISTRIBUTED=OFF -DUSE_FBGEMM=OFF \
--DUSE_MAGMA=OFF -DUSE_MKLDNN=OFF -DUSE_NNPACK=OFF -DUSE_NUMA=OFF -DUSE_NUMPY=OFF \
--DUSE_OPENCV=0 -DUSE_OPENMP=OFF -DUSE_QNNPACK=OFF -DUSE_ROCM=OFF -DUSE_XNNPACK=OFF \
+-DUSE_KINETO=OFF -DUSE_MAGMA=OFF -DUSE_MKLDNN=OFF -DUSE_NNPACK=OFF -DUSE_NUMA=OFF \
+-DUSE_NUMPY=OFF -DUSE_OPENCV=0 -DUSE_OPENMP=OFF -DUSE_PYTORCH_QNNPACK=OFF \
+-DUSE_QNNPACK=OFF -DUSE_ROCM=OFF -DUSE_XNNPACK=OFF \
 -DCMAKE_BUILD_TYPE:STRING=Debug \
 -DPYTHON_EXECUTABLE:PATH=<path_to_python> \
 -DCMAKE_INSTALL_PREFIX:PATH=<target_install_path> \
 <path_to_pytorch_source>
 ```
 
-**NOTE**: Other build options may be used in a similar use-case as the ones listed above.
+**NOTE**: Other build options may be used in a similar use-case as the ones listed above. In the generation of the build tool files, CMake generates a summary of the different build options. These can also be looked at to adjust the above.
 
 Finally, build and install:
 
 ```bash
-cmake --build . --target install
+cmake --build . --target install -- -j [<jobs>]
 ```
+
+The `-j` build option denotes to build with concurrent processes, with the max number specified by `<jobs>`. If omitted, the native build tool's default number is used.
 
 Once that's done, the required files will be copied to a single path for easy lookup:
 
 ```bash
+# Create directories
+sudo mkdir /usr/local/libtorch
+sudo mkdir /usr/local/libtorch/share
+
+# From PyTorch source:
+sudo cp -r install/include/ /usr/local/libtorch
+sudo cp -r install/share/cmake/ /usr/local/libtorch/share
+sudo cp -r build_libtorch/lib/ /usr/local/libtorch
 ```
 
