@@ -15,7 +15,7 @@ if (DOWNLOAD_MNIST)
     endif()
 endif()
 
-add_executable(DCGAN_MNIST main.cpp)
+add_executable(DCGAN_MNIST main.cpp network/generator.h network/discriminator.h)
 
 set(CMAKE_PREFIX_PATH /usr/local/libtorch/share/cmake/Torch)
 
