@@ -36,6 +36,7 @@ using namespace torch;
 
 int main(int argc, const char* argv[])
 {
+    // Sets the seed for generating random numbers
     torch::manual_seed(1);
 
     // Create the device we pass around based on whether CUDA is available.
@@ -46,6 +47,8 @@ int main(int argc, const char* argv[])
         device = torch::Device(torch::kCUDA);
     }
 
+    // Creates the generator, passing it and the discriminator to the
+    // device
     DCGANGenerator generator(kNoiseSize);
     generator->to(device);
     discriminator->to(device);
@@ -57,15 +60,20 @@ int main(int argc, const char* argv[])
     const int64_t batches_per_epoch =
             std::ceil(dataset.size().value() / static_cast<double>(kBatchSize));
 
+    // data_loader is a torch::data::StatelessDataLoader<>, which wraps the MNIST data around an iterable
+    // for easy access. Specifically, the iterable produces batch requests in sets
     auto data_loader = torch::data::make_data_loader(
             std::move(dataset),
             torch::data::DataLoaderOptions().batch_size(kBatchSize).workers(2));
 
+    // Both generator and discriminator will make use of the Adam algorithm, which is a method for
+    // stochastic optimization
     torch::optim::Adam generator_optimizer(
             generator->parameters(), torch::optim::AdamOptions(2e-4).betas(std::make_tuple (0.5, 0.5)));
     torch::optim::Adam discriminator_optimizer(
             discriminator->parameters(), torch::optim::AdamOptions(2e-4).betas(std::make_tuple (0.5, 0.5)));
 
+    // Can be used to restore models and optimizers from a previous saved state
     if (kRestoreFromCheckpoint)
     {
         torch::load(generator, "generator-checkpoint.pt");
@@ -75,6 +83,7 @@ int main(int argc, const char* argv[])
                 discriminator_optimizer, "discriminator-optimizer-checkpoint.pt");
     }
 
+    // Training loop
     int64_t checkpoint_counter = 1;
     for (int64_t epoch = 1; epoch <= kNumberOfEpochs; ++epoch)
     {
@@ -125,6 +134,7 @@ int main(int argc, const char* argv[])
                         g_loss.item<float>());
             }
 
+            // Checkpointing
             if (batch_index % kCheckpointEvery == 0)
             {
                 // Checkpoint the model and optimizer state.
