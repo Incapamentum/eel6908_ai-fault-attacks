@@ -98,7 +98,7 @@ classDiagram
 	}
 ```
 
-Not previous discussed, the `DefaultCPUAllocator` extends an `Allocator` struct defined in the same file as the `DataPtr`. Both play important roles in the memory allocation mechanisms for Tensors.
+Not previously discussed, the `DefaultCPUAllocator` extends an `Allocator` struct defined in the same file as the `DataPtr`. Both play important roles in the memory allocation mechanisms for Tensors.
 
 ## Memory Allocation
 
@@ -163,9 +163,11 @@ The code for `alloc_cpu()` is rather complex, but the start of the function will
   - POSIX
     - `int err = posix_memalign(&data, gAlignment, nbytes);`
 - `data` is then moved to a thread's NUMA node:
-  - `NUMAMOve(data, nbytes, GetCurrentNUMANode());`
+  - `NUMAMove(data, nbytes, GetCurrentNUMANode());`
 - Some checks are then to determine whether a zero-fill or a junk-fill will be done
 
-Of interest is the `posix_memalign()` function call. Details can be found [here](https://man7.org/linux/man-pages/man3/posix_memalign.3.html). For the sake of documentation, the function takes three parameters: `void** memptr`, `size_t alignment`, and `size_t size`. When called, the function allocates `size` bytes and places the address of allocated memory in `memptr`. The address of the allocated memory will be a multiple of `alignment`, which must be a power of two and a multiple of `sizeof(void *)`.
+Of interest is the `posix_memalign()` function call. Details can be found [here](https://man7.org/linux/man-pages/man3/posix_memalign.3.html). For the sake of documentation, the function takes three parameters: `void** memptr`, `size_t alignment`, and `size_t size`. When called, the function allocates `size` bytes and places the address of allocated memory in `*memptr`. The address of the allocated memory will be a multiple of `alignment`, whose value must be a power of two and a multiple of `sizeof(void *)`.
+
+Note that the `sizeof()` operator may return a different value depending on the compiler used. On `gcc 9.4.0`, `sizeof(void *)` returns 8 bytes.
 
 ## Summary
