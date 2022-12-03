@@ -170,4 +170,6 @@ Of interest is the `posix_memalign()` function call. Details can be found [here]
 
 Note that the `sizeof()` operator may return a different value depending on the compiler used. On `gcc 9.4.0`, `sizeof(void *)` returns 8 bytes.
 
+The value of `gAlignment` can be found in the `c10/core/alignment.h` file. On a mobile platform, `gAlignment = 16`, but on all other platforms `gAlignment = 64`.
+
 ## Summary
