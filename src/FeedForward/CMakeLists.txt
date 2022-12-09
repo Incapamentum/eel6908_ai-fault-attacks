@@ -16,14 +16,11 @@ if (DOWNLOAD_MNIST)
     endif()
 endif()
 
-# Executables
-add_executable(Training Training/training.cpp net/net.h)
-add_executable(Inference Inference/inference.cpp net/net.h)
+# NOTE: follow the below portions for the Inference subproject
 
-set(CMAKE_PREFIX_PATH /usr/local/libtorch/share/cmake/Torch)
+option(BUILD_TRAINING "Enable building Training" ON)
+option(BUILD_INFERENCE "Enable building Inference" ON)
 
-find_package(Torch REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-
-target_link_libraries(Training "${TORCH_LIBRARIES}")
-target_link_libraries(Inference "${TORCH_LIBRARIES}")
+if (BUILD_TRAINING)
+    add_subdirectory(Training)
+endif()

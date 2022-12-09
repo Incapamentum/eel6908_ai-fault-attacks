@@ -2,8 +2,12 @@
 
 #include "../net/net.h"
 
+// Testing stuff real quick
+#include <filesystem>
+#include <iostream>
+
 int main(void)
 {
-    std::cout << "Hello, World!\n";
-    return 0;
+    std::filesystem::path cwd = std::filesystem::current_path();
+    std::cout << cwd;
 }
