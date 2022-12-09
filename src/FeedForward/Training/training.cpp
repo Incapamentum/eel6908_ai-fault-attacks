@@ -1,15 +1,26 @@
+#include <filesystem>
+
 #include <torch/torch.h>
 
 #include "../net/net.h"
+
+namespace fs = std::filesystem;
 
 int main(void)
 {
     // Create a new Net.
     auto net = std::make_shared<Net>();
 
+    // Creating model path
+    fs::path md{ fs::current_path() / "../model" };
+
+    // Create model directory if it doesn't exist
+    if (!fs::is_directory(md))
+        fs::create_directory(md);
+
     // Create a multi-threaded data loader for the MNIST dataset.
     auto data_loader = torch::data::make_data_loader(
-            torch::data::datasets::MNIST("./data").map(
+            torch::data::datasets::MNIST("../data").map(
                     torch::data::transforms::Stack<>()),
             /*batch_size=*/64);
 
@@ -38,7 +49,7 @@ int main(void)
                 std::cout << "Epoch: " << epoch << " | Batch: " << batch_index
                           << " | Loss: " << loss.item<float>() << std::endl;
                 // Serialize your model periodically as a checkpoint.
-                torch::save(net, "net.pt");
+                torch::save(net, md / "net.pt");
             }
         }
     }
