@@ -9,27 +9,27 @@ namespace fs = std::filesystem;
 int main(void)
 {
     // Create a new Net.
-    auto net = std::make_shared<Net>();
+    auto net { std::make_shared<Net>() };
 
     // Creating model path
-    fs::path md{ fs::current_path() / "../model" };
+    fs::path md { fs::current_path() / "../model" };
 
     // Create model directory if it doesn't exist
     if (!fs::is_directory(md))
         fs::create_directory(md);
 
     // Create a multi-threaded data loader for the MNIST dataset.
-    auto data_loader = torch::data::make_data_loader(
+    auto data_loader { torch::data::make_data_loader(
             torch::data::datasets::MNIST("../data").map(
                     torch::data::transforms::Stack<>()),
-            /*batch_size=*/64);
+            /*batch_size=*/64) };
 
     // Instantiate an SGD optimization algorithm to update our Net's parameters.
     torch::optim::SGD optimizer(net->parameters(), /*lr=*/0.01);
 
     for (size_t epoch = 1; epoch <= 10; ++epoch)
     {
-        size_t batch_index = 0;
+        size_t batch_index{ 0 };
         // Iterate the data loader to yield batches from the dataset.
         for (auto& batch : *data_loader)
         {
